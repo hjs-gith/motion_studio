@@ -1,0 +1,125 @@
+{
+  "title": "Designing Calm Software",
+  "author": "Motion Studio",
+  "lang": "en",
+  "theme": { "preset": "minimal" },
+  "transition": { "type": "fade", "durationSec": 0.5 },
+  "voice": { "engine": "none", "voice": "M1", "speed": 1.05 },
+  "captions": false,
+  "slides": [
+    {
+      "id": "intro",
+      "layout": "title",
+      "kicker": "Product brief",
+      "title": "Designing calm software",
+      "subtitle": "Fewer choices, clearer defaults, better outcomes",
+      "narration": "This is a short brief on designing calm software: products with fewer choices, clearer defaults, and better outcomes."
+    },
+    {
+      "id": "agenda",
+      "layout": "agenda",
+      "items": ["Why clutter costs us", "The calm pipeline", "Principles in practice", "Legacy versus calm", "What we ship next"],
+      "narration": "We will cover why clutter costs us, the pipeline we use, the principles in practice, a comparison, and what we ship next."
+    },
+    {
+      "id": "cost",
+      "layout": "big-number",
+      "kicker": "Why clutter costs us",
+      "value": 73,
+      "suffix": "%",
+      "label": "of trial users never finish setup",
+      "context": "Illustrative example data. Every extra step in onboarding is a place where people quietly give up.",
+      "narration": "In this illustrative example, seventy-three percent of trial users never finish setup. Every extra step is a place where people quietly give up."
+    },
+    {
+      "id": "pipeline",
+      "layout": "visual",
+      "title": "The calm pipeline",
+      "src": "flow.svg",
+      "caption": "Each stage has one job and one output.",
+      "narration": "Our pipeline has four stages. Capture the raw material. Structure it into an outline and a script. Render motion and audio. And ship every format at once.",
+      "stepSec": 0.7
+    },
+    {
+      "id": "principles",
+      "layout": "cards",
+      "kicker": "Principles in practice",
+      "title": "Three rules we design by",
+      "cards": [
+        {
+          "title": "One primary action",
+          "text": "Every screen has a single obvious next step.",
+          "icon": "<svg viewBox=\"0 0 48 48\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.5\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><circle cx=\"24\" cy=\"24\" r=\"18\"/><circle cx=\"24\" cy=\"24\" r=\"6\"/></svg>"
+        },
+        {
+          "title": "Defaults that decide",
+          "text": "Smart defaults replace settings nobody reads.",
+          "icon": "<svg viewBox=\"0 0 48 48\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.5\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M8 14h32M8 24h20M8 34h26\"/><circle cx=\"36\" cy=\"24\" r=\"4\"/></svg>"
+        },
+        {
+          "title": "Quiet feedback",
+          "text": "Confirm with motion, not with modal dialogs.",
+          "icon": "<svg viewBox=\"0 0 48 48\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.5\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M10 25l9 9 19-20\"/></svg>"
+        }
+      ],
+      "narration": "We design by three rules. One primary action per screen. Defaults that make the decision for you. And quiet feedback, using motion instead of modal dialogs."
+    },
+    {
+      "id": "interface",
+      "layout": "image-text",
+      "kicker": "In practice",
+      "title": "Less on screen, more in focus",
+      "src": "layers.svg",
+      "side": "left",
+      "bullets": ["Group by task, not by feature", "Hide advanced options until needed", "Use one accent color for the next step"],
+      "narration": "In practice, that means grouping by task instead of by feature, hiding advanced options until they are needed, and reserving the single accent color for the next step."
+    },
+    {
+      "id": "compare",
+      "layout": "comparison",
+      "title": "Legacy versus calm",
+      "columns": ["Legacy", "Calm"],
+      "highlight": 2,
+      "rows": [
+        { "label": "Setup steps", "values": ["12", "3"] },
+        { "label": "Smart defaults", "values": [false, true] },
+        { "label": "Single primary action", "values": [false, true] },
+        { "label": "Settings pages", "values": ["9", "2"] },
+        { "label": "Works offline", "values": [true, true] }
+      ],
+      "narration": "Side by side, the calm version cuts setup from twelve steps to three, replaces most settings with defaults, and keeps what already worked."
+    },
+    {
+      "id": "voice",
+      "layout": "quote",
+      "text": "The best interface is the one you stop noticing after the first minute.",
+      "author": "Design team principle",
+      "role": "Internal handbook",
+      "narration": "As our handbook puts it: the best interface is the one you stop noticing after the first minute."
+    },
+    {
+      "id": "next",
+      "layout": "section",
+      "number": "05",
+      "title": "What we ship next",
+      "subtitle": "One source, every format"
+    },
+    {
+      "id": "outputs",
+      "layout": "visual",
+      "title": "One source of truth",
+      "src": "hub.svg",
+      "position": "left",
+      "bullets": ["Slides, script and video stay in sync", "Edit once, re-render everything", "Native PowerPoint for final polish"],
+      "narration": "Everything ships from one source of truth. Slides, script and video stay in sync, you edit once and re-render, and the PowerPoint stays editable for final polish."
+    },
+    {
+      "id": "outro",
+      "layout": "end",
+      "title": "Build calmer products",
+      "subtitle": "Questions and feedback welcome",
+      "cta": "Read the full brief",
+      "narration": "Thank you. Let's build calmer products."
+    }
+  ]
+}

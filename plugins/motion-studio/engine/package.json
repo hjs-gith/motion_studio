@@ -1,0 +1,32 @@
+{
+  "name": "motion-studio-engine",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Rendering engine for the motion-studio Claude Code plugin",
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "cli": "tsx src/cli/main.ts"
+  },
+  "dependencies": {
+    "@remotion/bundler": "4.0.529",
+    "@remotion/google-fonts": "4.0.529",
+    "@remotion/player": "4.0.529",
+    "@remotion/renderer": "4.0.529",
+    "@remotion/transitions": "4.0.529",
+    "esbuild": "^0.28.2",
+    "pdf-lib": "^1.17.1",
+    "pptxgenjs": "^4.0.1",
+    "react": "^19.3.0",
+    "react-dom": "^19.3.0",
+    "remotion": "4.0.529",
+    "tsx": "^4.23.15",
+    "zod": "^4.6.5"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "typescript": "^5.9.0"
+  }
+}

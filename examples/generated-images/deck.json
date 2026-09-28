@@ -1,0 +1,41 @@
+{
+  "title": "Morning Rituals",
+  "lang": "en",
+  "theme": { "preset": "minimal" },
+  "images": { "provider": "openai", "model": "gpt-image-2.5-flare", "quality": "medium" },
+  "slides": [
+    {
+      "id": "hero",
+      "layout": "image",
+      "title": "Morning rituals",
+      "caption": "Small habits, calmer days",
+      "generate": { "prompt": "A sunlit kitchen table at dawn with a ceramic coffee cup, an open notebook and a small plant, seen from a low angle" },
+      "narration": "Small morning rituals set the tone for calmer days."
+    },
+    {
+      "id": "focus",
+      "layout": "image-text",
+      "kicker": "Habit one",
+      "title": "Start without a screen",
+      "side": "right",
+      "bullets": ["Ten minutes before the phone", "Write one intention", "Move, stretch, breathe"],
+      "generate": { "prompt": "A person's hands writing in a paper journal beside a window, soft morning light, no face visible" },
+      "narration": "Start the day without a screen. Spend ten minutes before the phone, write one intention, and move a little."
+    },
+    {
+      "id": "contrast",
+      "layout": "split",
+      "title": "Two ways to start",
+      "left": { "heading": "Rushed", "bullets": ["Notifications first", "Skipped breakfast"], "generate": { "prompt": "A cluttered desk with a glowing phone and scattered papers in dim early light" } },
+      "right": { "heading": "Rested", "bullets": ["One intention", "Slow coffee"], "generate": { "prompt": "A tidy desk with a single notebook and a cup of coffee in warm sunlight" } },
+      "narration": "Compare a rushed start with a rested one. The difference is a few deliberate minutes."
+    },
+    {
+      "id": "outro",
+      "layout": "end",
+      "title": "Try it tomorrow",
+      "cta": "Pick one ritual",
+      "narration": "Try one ritual tomorrow morning."
+    }
+  ]
+}

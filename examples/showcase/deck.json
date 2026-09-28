@@ -1,0 +1,197 @@
+{
+  "title": "Motion Studio",
+  "author": "Your Name",
+  "lang": "en",
+  "format": {
+    "width": 1920,
+    "height": 1080,
+    "fps": 30
+  },
+  "theme": {
+    "preset": "midnight"
+  },
+  "transition": {
+    "type": "fade",
+    "durationSec": 0.6
+  },
+  "voice": {
+    "engine": "supertonic",
+    "voice": "F1",
+    "speed": 1.05
+  },
+  "captions": true,
+  "slides": [
+    {
+      "id": "intro",
+      "layout": "title",
+      "kicker": "Claude Code plugin",
+      "title": "Motion Studio",
+      "subtitle": "Presentations, scripts and motion-graphics video from a single spec",
+      "narration": "Welcome to Motion Studio. One deck file becomes a slide deck, a narration script, and a fully animated video."
+    },
+    {
+      "id": "why",
+      "layout": "bullets",
+      "kicker": "Why",
+      "title": "One source, every format",
+      "bullets": [
+        {
+          "text": "Write the story once",
+          "sub": "Slides, script and video stay in sync"
+        },
+        {
+          "text": "Motion by default",
+          "sub": "Every layout animates in with spring physics"
+        },
+        {
+          "text": "Editable outputs",
+          "sub": "Native PowerPoint with real charts and speaker notes"
+        }
+      ],
+      "narration": "Instead of maintaining a deck, a script and a video separately, you write the story once. Every layout animates in automatically, and the PowerPoint export stays fully editable.",
+      "transition": {
+        "type": "slide",
+        "direction": "from-right"
+      }
+    },
+    {
+      "id": "numbers",
+      "layout": "stat",
+      "title": "Fast by design",
+      "stats": [
+        {
+          "value": 11,
+          "label": "animated layouts"
+        },
+        {
+          "value": 5,
+          "label": "output formats"
+        },
+        {
+          "value": 31,
+          "label": "TTS languages with Supertonic"
+        }
+      ],
+      "narration": "There are eleven animated layouts, five output formats, and narration in thirty-one languages with Supertonic."
+    },
+    {
+      "id": "growth",
+      "layout": "chart",
+      "title": "Charts that draw themselves",
+      "chart": {
+        "type": "bar",
+        "labels": [
+          "Q1",
+          "Q2",
+          "Q3",
+          "Q4"
+        ],
+        "series": [
+          {
+            "name": "2025",
+            "values": [
+              12,
+              19,
+              27,
+              34
+            ]
+          },
+          {
+            "name": "2026",
+            "values": [
+              18,
+              26,
+              38,
+              52
+            ]
+          }
+        ]
+      },
+      "caption": "Sample data",
+      "narration": "Charts are defined as data, animate on screen, and export as native, editable PowerPoint charts.",
+      "transition": {
+        "type": "wipe",
+        "direction": "from-left"
+      }
+    },
+    {
+      "id": "compare",
+      "layout": "split",
+      "title": "Before and after",
+      "left": {
+        "heading": "Before",
+        "bullets": [
+          "Three tools",
+          "Manual re-timing",
+          "Out-of-sync edits"
+        ]
+      },
+      "right": {
+        "heading": "After",
+        "bullets": [
+          "One deck.json",
+          "Timing fits the narration",
+          "Re-render in one command"
+        ]
+      },
+      "narration": "Before, a talk meant three tools and a lot of manual re-timing. Now it is one file, and timing adapts to the narration automatically."
+    },
+    {
+      "id": "roadmap",
+      "layout": "timeline",
+      "title": "How a deck gets made",
+      "items": [
+        {
+          "label": "01",
+          "title": "Brief",
+          "text": "Topic, audience, length"
+        },
+        {
+          "label": "02",
+          "title": "Outline",
+          "text": "Story arc and slide plan"
+        },
+        {
+          "label": "03",
+          "title": "Script",
+          "text": "Narration per slide"
+        },
+        {
+          "label": "04",
+          "title": "Render",
+          "text": "Video, slides, PPTX"
+        }
+      ],
+      "narration": "The workflow is simple: a brief, an outline, a script, and then a render."
+    },
+    {
+      "id": "code",
+      "layout": "code",
+      "title": "Render everything",
+      "language": "bash",
+      "code": "# preview slides as images\nmotionstudio stills deck.json\n\n# narrate with open-source TTS\nmotionstudio tts deck.json\n\n# video, HTML, PPTX, PDF and script\nmotionstudio render deck.json",
+      "highlight": [
+        8
+      ],
+      "narration": "Three commands cover it: preview stills, generate narration, and render every format."
+    },
+    {
+      "id": "quote",
+      "layout": "statement",
+      "text": "The best presentation is the one your audience remembers.",
+      "attribution": "Every good speaker",
+      "narration": "Because in the end, the best presentation is the one your audience remembers.",
+      "transition": {
+        "type": "iris"
+      }
+    },
+    {
+      "id": "outro",
+      "layout": "end",
+      "title": "Thank you",
+      "subtitle": "Made with Motion Studio",
+      "cta": "Start your deck",
+      "narration": "Thanks for watching. Now go make something memorable."
+    }
+  ]
+}

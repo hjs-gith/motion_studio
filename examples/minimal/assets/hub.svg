@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 720">
+  <!-- Hub-and-spoke: one source of truth feeding each output. -->
+  <g data-step="1">
+    <circle cx="450" cy="360" r="120" fill="var(--accent)" stroke="var(--accent)" stroke-width="3"/>
+    <text x="450" y="350" font-size="34" font-weight="600" text-anchor="middle" fill="var(--bg)">deck</text>
+    <text x="450" y="392" font-size="34" font-weight="600" text-anchor="middle" fill="var(--bg)">.json</text>
+  </g>
+  <g data-step="2">
+    <path d="M450 240 V 120" stroke="var(--muted)" stroke-width="2.5" fill="none"/>
+    <circle cx="450" cy="80" r="40" fill="var(--bg)" stroke="var(--text)" stroke-width="2.5"/>
+    <text x="450" y="89" font-size="24" text-anchor="middle" fill="var(--text)">MP4</text>
+  </g>
+  <g data-step="3">
+    <path d="M565 320 L 700 250" stroke="var(--muted)" stroke-width="2.5" fill="none"/>
+    <circle cx="745" cy="230" r="40" fill="var(--bg)" stroke="var(--text)" stroke-width="2.5"/>
+    <text x="745" y="239" font-size="24" text-anchor="middle" fill="var(--text)">PPTX</text>
+  </g>
+  <g data-step="4">
+    <path d="M540 450 L 670 540" stroke="var(--muted)" stroke-width="2.5" fill="none"/>
+    <circle cx="705" cy="570" r="40" fill="var(--bg)" stroke="var(--text)" stroke-width="2.5"/>
+    <text x="705" y="579" font-size="24" text-anchor="middle" fill="var(--text)">HTML</text>
+  </g>
+  <g data-step="5">
+    <path d="M360 450 L 230 540" stroke="var(--muted)" stroke-width="2.5" fill="none"/>
+    <circle cx="195" cy="570" r="40" fill="var(--bg)" stroke="var(--text)" stroke-width="2.5"/>
+    <text x="195" y="579" font-size="24" text-anchor="middle" fill="var(--text)">PDF</text>
+  </g>
+  <g data-step="6">
+    <path d="M335 320 L 200 250" stroke="var(--muted)" stroke-width="2.5" fill="none"/>
+    <circle cx="155" cy="230" r="40" fill="var(--bg)" stroke="var(--text)" stroke-width="2.5"/>
+    <text x="155" y="239" font-size="24" text-anchor="middle" fill="var(--text)">SRT</text>
+  </g>
+</svg>

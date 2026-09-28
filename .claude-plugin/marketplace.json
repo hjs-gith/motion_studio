@@ -1,0 +1,12 @@
+{
+  "name": "motion-studio-marketplace",
+  "description": "Local marketplace for the motion-studio plugin",
+  "owner": { "name": "hjs" },
+  "plugins": [
+    {
+      "name": "motion-studio",
+      "source": "./plugins/motion-studio",
+      "description": "Turn a topic or document into a presentation, narration script, and motion-graphics video"
+    }
+  ]
+}

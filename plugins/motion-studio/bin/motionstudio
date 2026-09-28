@@ -1,0 +1,123 @@
+#!/usr/bin/env node
+// motion-studio launcher. On the Bash PATH while the plugin is enabled.
+// Installs the rendering engine (node_modules, headless Chrome) and optional Python TTS
+// into a persistent home, then forwards commands to the engine CLI.
+"use strict";
+const { spawnSync } = require("node:child_process");
+const crypto = require("node:crypto");
+const fs = require("node:fs");
+const os = require("node:os");
+const path = require("node:path");
+
+const PLUGIN_ROOT = path.resolve(fs.realpathSync(__dirname), "..");
+const ENGINE_SRC = path.join(PLUGIN_ROOT, "engine");
+const HOME = process.env.MOTION_STUDIO_HOME || path.join(os.homedir(), ".cache", "motion-studio");
+const DEV = fs.existsSync(path.join(ENGINE_SRC, "node_modules"));
+const ENGINE = DEV ? ENGINE_SRC : path.join(HOME, "engine");
+
+const TTS_PACKAGES = {
+  supertonic: ["supertonic"],
+};
+
+function log(msg) {
+  process.stderr.write(msg + "\n");
+}
+
+function run(cmd, args, opts = {}) {
+  const r = spawnSync(cmd, args, { stdio: "inherit", ...opts });
+  if (r.error) throw r.error;
+  if (r.status !== 0) {
+    log(`✗ ${cmd} ${args.join(" ")} failed (exit ${r.status})`);
+    process.exit(r.status || 1);
+  }
+}
+
+function hashFile(f) {
+  return crypto.createHash("sha1").update(fs.readFileSync(f)).digest("hex");
+}
+
+/** Copies engine sources into HOME and installs dependencies when package.json changed. */
+function ensureEngine() {
+  if (DEV) return;
+  fs.mkdirSync(ENGINE, { recursive: true });
+  for (const item of ["src", "tts", "package.json", "package-lock.json", "tsconfig.json"]) {
+    const from = path.join(ENGINE_SRC, item);
+    const to = path.join(ENGINE, item);
+    if (!fs.existsSync(from)) continue;
+    fs.rmSync(to, { recursive: true, force: true });
+    fs.cpSync(from, to, { recursive: true });
+  }
+  const stamp = path.join(ENGINE, ".installed");
+  const want = hashFile(path.join(ENGINE, "package.json"));
+  const have = fs.existsSync(stamp) ? fs.readFileSync(stamp, "utf8").trim() : "";
+  if (want !== have || !fs.existsSync(path.join(ENGINE, "node_modules"))) {
+    log(`• Installing motion-studio engine into ${ENGINE} (one time, ~1 min)…`);
+    run("npm", ["install", "--no-audit", "--no-fund", "--loglevel=error"], { cwd: ENGINE });
+    fs.writeFileSync(stamp, want);
+  }
+}
+
+function engineCli(args) {
+  const tsx = path.join(ENGINE, "node_modules", ".bin", "tsx");
+  // Run from the engine dir: Remotion caches headless Chrome relative to the cwd's package.json,
+  // which must never be the user's project. User paths are resolved against MOTION_STUDIO_CWD.
+  const r = spawnSync(tsx, [path.join(ENGINE, "src", "cli", "main.ts"), ...args], {
+    stdio: "inherit",
+    cwd: ENGINE,
+    env: { ...process.env, MOTION_STUDIO_HOME: HOME, MOTION_STUDIO_CWD: process.cwd() },
+  });
+  if (r.error) throw r.error;
+  return r.status ?? 1;
+}
+
+function findPython() {
+  for (const py of ["python3.12", "python3.11", "python3.10", "python3"]) {
+    const r = spawnSync(py, ["-c", "import sys; print(sys.version_info >= (3, 10))"], { encoding: "utf8" });
+    if (r.status === 0 && r.stdout.trim() === "True") return py;
+  }
+  return undefined;
+}
+
+function setupTts(engine) {
+  const pkgs = TTS_PACKAGES[engine];
+  if (!pkgs) {
+    log(`✗ Unknown TTS engine "${engine}". Choose: ${Object.keys(TTS_PACKAGES).join(", ")}`);
+    process.exit(2);
+  }
+  const venv = path.join(HOME, "venv");
+  const vpy = path.join(venv, "bin", "python");
+  if (!fs.existsSync(vpy)) {
+    const py = findPython();
+    if (!py) {
+      log("✗ Python 3.10+ is required for Supertonic. Install it (e.g. `brew install python@3.12`) and retry.");
+      process.exit(1);
+    }
+    log(`• Creating Python venv at ${venv}…`);
+    fs.mkdirSync(HOME, { recursive: true });
+    run(py, ["-m", "venv", venv]);
+    run(vpy, ["-m", "pip", "install", "--quiet", "--upgrade", "pip"]);
+  }
+  log(`• Installing ${pkgs.join(", ")} into the venv…`);
+  run(vpy, ["-m", "pip", "install", "--quiet", "--upgrade", ...pkgs]);
+  log(`✔ ${engine} installed. Model weights download on first synthesis.`);
+}
+
+function main() {
+  const args = process.argv.slice(2);
+  if (args[0] === "setup") {
+    ensureEngine();
+    let status = engineCli(["ensure-browser"]);
+    const i = args.indexOf("--tts");
+    if (i !== -1) setupTts(args[i + 1]);
+    status = engineCli(["doctor"]) || status;
+    process.exit(status);
+  }
+  if (args[0] === "where") {
+    console.log(`plugin: ${PLUGIN_ROOT}\nengine: ${ENGINE}${DEV ? " (dev, in-place)" : ""}\nhome:   ${HOME}`);
+    return;
+  }
+  ensureEngine();
+  process.exit(engineCli(args));
+}
+
+main();
