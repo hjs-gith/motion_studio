@@ -2,7 +2,7 @@ import React from "react";
 import { interpolate, spring, useCurrentFrame, useVideoConfig, Easing } from "remotion";
 import type { SlideSpec } from "../../spec";
 import { alpha, fontStack, type Theme } from "../../themes";
-import { Reveal, fitSize, useCountUp, useLook, useTheme } from "../anim";
+import { Reveal, fitSize, settle, useCountUp, useLook, useTheme } from "../anim";
 import { useU } from "../Background";
 import { Heading, Stage } from "./common";
 
@@ -166,7 +166,7 @@ const BarChart: React.FC<{ slide: Of<"chart"> }> = ({ slide }) => {
           <g key={li}>
             {series.map((s, si) => {
               const v = s.values[li] ?? 0;
-              const p = spring({ frame: frame - 14 - li * 5 - si * 3, fps, config: { damping: 16, stiffness: 90 } });
+              const p = settle(spring({ frame: frame - 14 - li * 5 - si * 3, fps, config: { damping: 16, stiffness: 90 } }));
               const h = (v / max) * H * p;
               const x = gx + si * barW;
               return (

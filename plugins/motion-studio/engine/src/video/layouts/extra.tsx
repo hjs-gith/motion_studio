@@ -250,7 +250,7 @@ export const QuoteSlide: React.FC<{ slide: Of<"quote"> }> = ({ slide }) => {
               overflow: "hidden",
               flexShrink: 0,
               opacity: p,
-              transform: `scale(${0.94 + 0.06 * p})`,
+              transform: p === 1 ? undefined : `scale(${0.94 + 0.06 * p})`,
               boxShadow: lk.glow ? `0 0 0 ${u(8)}px ${alpha(theme.colors.accent, 0.25)}` : `0 0 0 ${u(2)}px ${alpha(theme.colors.text, 0.12)}`,
             }}
           >

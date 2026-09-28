@@ -30,13 +30,26 @@ export function useAsset(src: string): string {
   return useAssetResolver()(src);
 }
 
+/**
+ * Snaps a spring to exactly 1 once it is visually at rest (within 0.05%, i.e. ≤0.02px of travel).
+ *
+ * Why: Remotion renders frames in several browser tabs in parallel. An element left with a residual
+ * transform/filter (e.g. translateY(1e-15px)) stays on its own compositor layer, and each tab can
+ * rasterize that layer slightly differently depending on what it rendered before — so settled text
+ * "trembles" as consecutive frames alternate between tabs. Exact rest values let settled elements
+ * drop their transform/filter entirely and render identically in every tab.
+ */
+export function settle(v: number): number {
+  return Math.abs(1 - v) < 5e-4 ? 1 : v;
+}
+
 export function useSpring(delay = 0, config: { damping?: number; mass?: number; stiffness?: number } = {}) {
   const frame = useCurrentFrame();
   const { fps } = useVideoConfig();
   const lk = useLook();
   // Minimal style ignores per-call springiness so every element settles calmly.
   const cfg = lk.minimal ? lk.motion.spring : { ...lk.motion.spring, ...config };
-  return spring({ frame: frame - delay, fps, config: cfg });
+  return settle(spring({ frame: frame - delay, fps, config: cfg }));
 }
 
 type RevealFrom = "up" | "down" | "left" | "right" | "scale" | "blur" | "none";
@@ -62,7 +75,9 @@ export const Reveal: React.FC<{
   if (from === "right") transform = `translateX(${(1 - p) * distance}px)`;
   if (from === "scale") transform = `scale(${0.85 + 0.15 * p})`;
   const filter = from === "blur" ? `blur(${(1 - p) * 16}px)` : undefined;
-  return <div style={{ opacity, transform, filter, willChange: "transform, opacity", ...style }}>{children}</div>;
+  // Settled: no transform, filter or will-change, so the element renders as plain static content.
+  if (p === 1) return <div style={style}>{children}</div>;
+  return <div style={{ opacity, transform, filter, ...style }}>{children}</div>;
 };
 
 /** Reveals text word by word. */
@@ -85,7 +100,13 @@ export const WordReveal: React.FC<{
     <span style={style}>
       {tokens.map((tok, i) => {
         if (/^\s+$/.test(tok)) return <span key={i}>{tok}</span>;
-        const p = spring({ frame: frame - delay - wi++ * step, fps, config: lk.minimal ? lk.motion.spring : { damping: 20, stiffness: 120 } });
+        const p = settle(spring({ frame: frame - delay - wi++ * step, fps, config: lk.minimal ? lk.motion.spring : { damping: 20, stiffness: 120 } }));
+        if (p === 1)
+          return (
+            <span key={i} style={{ display: "inline-block", ...wordStyle }}>
+              {tok}
+            </span>
+          );
         return (
           <span
             key={i}
