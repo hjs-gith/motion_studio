@@ -3,4 +3,5 @@ node_modules/
 out/
 *.log
 examples/*/assets/audio/
-examples/*/assets/generated/placeholder-*
+# Generated images (paid API output + local placeholders) for example decks
+examples/*/assets/generated/
