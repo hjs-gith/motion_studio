@@ -1,6 +1,6 @@
 {
   "name": "motion-studio",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Build presentations (HTML, PPTX, PDF), narration scripts, and motion-graphics videos (MP4, via Remotion) from one deck spec, with optional local TTS narration (Supertonic).",
   "author": { "name": "hjs" },
   "keywords": ["presentation", "slides", "video", "remotion", "motion-graphics", "tts", "pptx"]
