@@ -269,8 +269,13 @@ export const Deck = z.object({
       spellAcronyms: z.boolean().default(true),
       /** In non-Latin-script decks, Latin phrases of at least this many words are voiced in English. 0 = never. */
       splitLatinPhrases: z.number().int().min(0).default(4),
+      /**
+       * Even out speaking rate between sentences (Supertonic, paced languages such as Korean): voice
+       * sentence by sentence and re-voice outliers toward a calibrated rate. Env MOTION_STUDIO_TTS_PACE=0 disables.
+       */
+      pace: z.boolean().default(true),
     })
-    .default({ engine: "none", speed: 1, lexicon: {}, spellAcronyms: true, splitLatinPhrases: 4 }),
+    .default({ engine: "none", speed: 1, lexicon: {}, spellAcronyms: true, splitLatinPhrases: 4, pace: true }),
   images: z
     .object({
       provider: z.string().default("openai"),

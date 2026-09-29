@@ -85,6 +85,8 @@ echo 'export OPENAI_API_KEY=sk-...' >> ~/.zshrc
 
 ## Mixed-language narration
 
+Korean narration is also **evenly paced**: sentences are voiced one by one and re-voiced toward a calibrated rate, so short sentences no longer rush and long ones no longer drag (`voice.pace`, on by default).
+
 Supertonic voices one language per call. Before synthesis, `voice.lexicon` respellings (`"Prompt": "프롬프트"`), acronym spelling (AI → 에이아이) and English-phrase segmentation are applied to the **audio only**; slides and captions keep the original text. See [`voices.md`](plugins/motion-studio/skills/create/reference/voices.md).
 
 ## How it works

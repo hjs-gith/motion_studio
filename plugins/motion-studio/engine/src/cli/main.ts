@@ -177,6 +177,26 @@ function validate(p: Project) {
   }
 }
 
+/**
+ * Korean respellings of English terms drop the plural -s and past-tense -ed ("Skills Map" → 스킬 맵,
+ * not 스킬스 맵). Suggests entries for flagged inflected words, reusing the base word's respelling
+ * when the lexicon already has it.
+ */
+function inflectionHint(lang: string, words: string[], lexicon: Record<string, string>): string {
+  if (!lang.toLowerCase().startsWith("ko")) return "";
+  const lower = new Map(Object.entries(lexicon).map(([k, v]) => [k.toLowerCase(), v]));
+  const hints: string[] = [];
+  for (const word of words) {
+    const m = /^([A-Za-z][A-Za-z-]*?)(ies|es|s|ed)$/.exec(word);
+    if (!m || /ss$/i.test(word) || m[1].length < 3) continue;
+    const bases = m[2] === "ies" ? [m[1] + "y"] : m[2] === "es" ? [m[1], m[1] + "e"] : m[2] === "ed" ? [m[1], m[1] + "e"] : [m[1]];
+    const known = bases.find((b) => lower.has(b.toLowerCase()));
+    hints.push(known ? `"${word}": "${lower.get(known.toLowerCase())}"` : `${word} → spell as ${bases[0]}`);
+  }
+  if (!hints.length) return "";
+  return `. Korean respellings drop -s/-ed (Skills → 스킬, Agents → 에이전트): ${hints.join(", ")}`;
+}
+
 function lint(p: Project): string[] {
   const { deck } = p;
   const w: string[] = [];
@@ -217,7 +237,10 @@ function lint(p: Project): string[] {
     if (deck.voice.engine !== "none" && s.narration) {
       const unknown = speechFor(deck, s.narration).unknownWords;
       if (unknown.length)
-        w.push(`${at}: English words will be read with ${deck.lang} rules: ${unknown.join(", ")}; add spoken forms to voice.lexicon (check with \`motionstudio tts --preview\`)`);
+        w.push(
+          `${at}: English words will be read with ${deck.lang} rules: ${unknown.join(", ")}; add spoken forms to voice.lexicon (check with \`motionstudio tts --preview\`)` +
+            inflectionHint(deck.lang, unknown, deck.voice.lexicon),
+        );
     }
     if (deck.voice.engine !== "none" && !s.narration) w.push(`${at}: no narration while a voice engine is set (slide will be silent)`);
     if (s.narration && s.durationSec && estimateSpeechSec(s.narration) > s.durationSec + 0.5)

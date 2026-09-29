@@ -25,12 +25,22 @@ Supertonic voices one language per call, so English inside Korean text would be 
 3. **English phrases** of at least `voice.splitLatinPhrases` words (default 4; 0 disables), such as a quoted English sentence, are voiced **in English** as their own segment and joined with a short pause.
 4. Remaining English words are flagged by `validate` ("will be read with ko rules").
 
+**Drop English inflections in Korean respellings.** Korean speakers say English terms in their base form, so lexicon entries leave out the plural `-s`/`-es` and past-tense `-ed`: "Skills Map" is 스킬 맵 (not 스킬스 맵), Agents → 에이전트, Applications → 애플리케이션, Prompts → 프롬프트, Tools → 툴, Deployed → 디플로이. `validate` suggests these for flagged inflected words in Korean decks, reusing the base word's respelling when it's already in the lexicon.
+
 **When writing Korean (or other non-Latin) narration, always:**
 - run `motionstudio tts <deck> --preview` to see exactly what will be spoken (English segments show as ⟦en: …⟧),
 - add every flagged word to `voice.lexicon` using its common Korean spelling (프롬프트, 워크플로우, 클로드, 노션, 깃허브),
 - keep single English terms in the lexicon and use English segments only for whole phrases or quotes.
 
 A lexicon change only re-voices the slides it affects.
+
+## Even pacing (Korean)
+Supertonic picks a tempo per call, so in Korean short sentences come out fast and long, comma-heavy ones slow (about a 25–35% spread within a slide). With `voice.pace` (default `true`), Korean segments are voiced **sentence by sentence**:
+- each sentence's rate (syllables per second, comma pauses excluded) is measured against a **target calibrated once per voice/speed** on neutral paragraphs, and cached in `assets/audio/pace-calibration.json` so later runs that re-voice only changed slides keep the same tempo;
+- sentences off target by more than 3% are re-voiced with an adjusted speed (bounded to 0.78–1.18× per sentence, up to 3 passes);
+- sentences are joined with a 0.40 s pause and short fades (no clicks). English segments inside Korean narration are voiced as before.
+
+Measured on a four-slide Korean deck, the deck-wide sentence-rate spread was 4–9% for F1–F5 (from 22–28%), and total narration length stayed within ±3% of unpaced. Set `"pace": false` in `voice`, or the env var `MOTION_STUDIO_TTS_PACE=0`, to turn it off; either change re-voices affected clips. `MOTION_STUDIO_TTS_DEBUG=1` logs each sentence's rate. Pacing makes Korean synthesis about 2–3× slower, plus a one-time calibration of a few seconds per voice/speed; it is still much faster than real time.
 
 ## macOS `say`
 - `voice.voice`: a system voice (`say -v '?'` lists them; e.g. `Samantha`, or `Yuna` for Korean).

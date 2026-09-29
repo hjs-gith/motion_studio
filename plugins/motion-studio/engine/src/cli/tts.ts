@@ -5,7 +5,7 @@ import os from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { log, narrationHash, readManifest, speechFor, wavDuration, writeManifest, type Project } from "./project";
-import { describeSegments, type SpeechSegment } from "../pronounce";
+import { PACED_LANGS, PACE_VERSION, describeSegments, pacingApplies, type SpeechSegment } from "../pronounce";
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const SYNTH = path.resolve(here, "../../tts/synth.py");
@@ -82,13 +82,27 @@ export async function generateNarration(p: Project, opts: { force?: boolean; onl
         voice: deck.voice.voice,
         lang: deck.lang,
         speed: deck.voice.speed,
+        // Calibrated target rates are cached per voice/speed/steps so runs that re-voice only some
+        // slides keep the same tempo as earlier runs.
+        pace: jobs.some((j) => pacingApplies(engine, deck.voice.pace, j.segments))
+          ? { version: PACE_VERSION, langs: PACED_LANGS, cache: path.join(p.audioDir, "pace-calibration.json") }
+          : null,
         jobs: jobs.map(({ id, segments, out }) => ({ id, segments, out })),
       }),
     );
     try {
       await new Promise<void>((resolve, reject) => {
         const child = spawn(py, [SYNTH, jobFile], { stdio: ["ignore", "pipe", "inherit"] });
-        child.stdout.on("data", () => undefined);
+        let buf = "";
+        child.stdout.on("data", (d: Buffer) => {
+          buf += d.toString("utf8");
+          let nl: number;
+          while ((nl = buf.indexOf("\n")) >= 0) {
+            const line = buf.slice(0, nl).trim();
+            buf = buf.slice(nl + 1);
+            if (line) reportPace(line);
+          }
+        });
         child.on("error", reject);
         child.on("exit", (code) => (code === 0 ? resolve() : reject(new Error(`TTS worker exited with code ${code}`))));
       });
@@ -107,4 +121,23 @@ export async function generateNarration(p: Project, opts: { force?: boolean; onl
   writeManifest(p, manifest);
   const total = jobs.reduce((a, j) => a + manifest[j.id].durationSec, 0);
   log(`• Wrote ${jobs.length} clip(s), ${total.toFixed(1)}s of narration.`);
+}
+
+/** Logs how much pacing evened out a slide's sentence rates (worker prints one JSON line per clip). */
+function reportPace(line: string) {
+  let msg: { id?: string; pace?: { before: number; after: number }[] };
+  try {
+    msg = JSON.parse(line);
+  } catch {
+    return;
+  }
+  const stats = msg.pace;
+  if (!stats || stats.length < 2) return;
+  const spread = (xs: number[]) => {
+    const sorted = [...xs].sort((a, b) => a - b);
+    return ((sorted[sorted.length - 1] - sorted[0]) / sorted[Math.floor(sorted.length / 2)]) * 100;
+  };
+  log(
+    `  ${msg.id}: paced ${stats.length} sentences, rate spread ${spread(stats.map((s) => s.before)).toFixed(0)}% → ${spread(stats.map((s) => s.after)).toFixed(0)}%`,
+  );
 }

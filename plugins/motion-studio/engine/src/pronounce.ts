@@ -9,6 +9,17 @@
 // Only the audio changes; slides, script, captions and SRT keep the original text.
 
 export type SpeechSegment = { text: string; lang: string };
+
+/** Languages whose segments the Supertonic worker paces sentence by sentence (see tts/synth.py). */
+export const PACED_LANGS = ["ko"];
+/** Bump when pacing behavior changes: it is part of the clip hash, so affected clips regenerate once. */
+export const PACE_VERSION = 1;
+
+/** Whether sentence pacing applies to these segments for this voice setup. */
+export function pacingApplies(engine: string, pace: boolean, segments: SpeechSegment[]): boolean {
+  if (engine !== "supertonic" || !pace || process.env.MOTION_STUDIO_TTS_PACE === "0") return false;
+  return segments.some((s) => PACED_LANGS.includes(s.lang.split("-")[0].toLowerCase()));
+}
 export type PreparedSpeech = { segments: SpeechSegment[]; unknownWords: string[] };
 
 export type PronounceOptions = {

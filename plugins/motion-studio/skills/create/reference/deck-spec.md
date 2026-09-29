@@ -33,6 +33,7 @@
 | `voice.voice` | Supertonic `F1`–`F5`/`M1`–`M5`, or a `say` voice name. |
 | `voice.lexicon` | Spoken respellings for TTS only, e.g. `{ "Prompt": "프롬프트" }`. See voices.md, "Mixed-language narration". |
 | `voice.spellAcronyms` | Spell all-caps acronyms with the deck language's letter names (default true). |
+| `voice.pace` | Even out speaking rate between sentences (Supertonic, Korean). Default `true`. See voices.md, "Even pacing". |
 | `voice.splitLatinPhrases` | In non-Latin decks, voice English phrases of at least N words in English (default 4, 0 = off). |
 | `images` | Image generation defaults: `{ "provider": "openai", "model": "gpt-image-2.5-flare", "quality": "medium", "style": "…" }`. See images.md. |
 | `captions` | Burn narration captions into the video. The SRT file is always produced. |

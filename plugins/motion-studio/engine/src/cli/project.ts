@@ -6,7 +6,7 @@ import { ZodError } from "zod";
 import { parseDeck, type DeckSpec, type SlideSpec } from "../spec";
 import type { AudioManifest } from "../timeline";
 import { applyGeneratedImages, type ImageJob } from "../images/jobs";
-import { prepareSpeech, type PreparedSpeech } from "../pronounce";
+import { PACE_VERSION, pacingApplies, prepareSpeech, type PreparedSpeech } from "../pronounce";
 
 export type Project = {
   deckPath: string;
@@ -99,8 +99,12 @@ export function speechFor(deck: DeckSpec, narration: string): PreparedSpeech {
 /** Cache key for a clip: hashes the spoken segments, so lexicon edits only re-voice affected slides. */
 export function narrationHash(deck: DeckSpec, narration: string): string {
   const v = deck.voice;
+  const segments = speechFor(deck, narration).segments;
+  const key: unknown[] = [v.engine, v.voice ?? "", v.speed, deck.lang, segments];
+  // Only paced clips carry the pacing version, so unpaced (e.g. English) clips keep their existing hashes.
+  if (pacingApplies(v.engine, v.pace, segments)) key.push(`pace-v${PACE_VERSION}`);
   return createHash("sha1")
-    .update(JSON.stringify([v.engine, v.voice ?? "", v.speed, deck.lang, speechFor(deck, narration).segments]))
+    .update(JSON.stringify(key))
     .digest("hex")
     .slice(0, 16);
 }
