@@ -18,6 +18,6 @@ Arguments: $ARGUMENTS
    - everything: `motionstudio render <deck>`
    - a subset: `motionstudio render <deck> --formats pptx,html`
    - a quick video check: `motionstudio render <deck> --formats video --draft`
-   - HTML with narration embedded: add `--html-audio`
+   - HTML with narration embedded: add `--html-audio` (the deck opens silent; the viewer presses Play to hear it, M to mute)
    Long video renders can run in the background.
 6. Report the output paths and the runtime.

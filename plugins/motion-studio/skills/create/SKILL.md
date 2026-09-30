@@ -84,7 +84,7 @@ motionstudio render <dir>                      # all formats
 motionstudio render <dir> --formats video --draft   # fast half-res preview
 motionstudio render <dir> --formats pptx,html,script
 ```
-Add `--html-audio` to embed the narration in the HTML deck. A 1080p video renders at roughly real-time speed or better; run long renders in the background and tell the user.
+Add `--html-audio` to embed the narration in the HTML deck. Such a deck opens **silent and paused** with a "Play with narration" button; nothing sounds until the viewer clicks it or presses Space (← → browse silently first, M mutes afterwards). A 1080p video renders at roughly real-time speed or better; run long renders in the background and tell the user.
 
 ### 10. Report
 List the output files with paths (`<dir>/out/…`), the runtime and the slide count. Mention how to tweak: edit `deck.json` and re-run `motionstudio render`, or ask you for changes. Don't paste the whole script into chat. It's in `out/<slug>-script.md`.

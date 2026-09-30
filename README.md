@@ -3,7 +3,7 @@
 A Claude Code plugin that turns a topic, brief or document into:
 
 - **Motion-graphics video** (MP4, 1080p, rendered with [Remotion](https://remotion.dev))
-- **HTML slides**: a single self-contained file that plays each slide's animation live
+- **HTML slides**: a single self-contained file that plays each slide's animation live. With `--html-audio` the narration is embedded; the deck opens silent with a Play button, and M toggles mute
 - **Editable PowerPoint** (.pptx) with native text, charts and speaker notes
 - **PDF** handout
 - **Script** (Markdown with timestamps) and **subtitles** (SRT)
