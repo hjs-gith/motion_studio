@@ -6,6 +6,7 @@ import { SingleSlideComposition, type DeckProps } from "../video/Deck";
 import { computeTimeline } from "../timeline";
 import { resolveTheme, fontStack, alpha } from "../themes";
 import { slideHeadline } from "../export/script";
+import { annotationParts } from "../spec";
 
 type Payload = DeckProps & { withAudio: boolean };
 declare global {
@@ -232,10 +233,30 @@ const App: React.FC = () => {
           }}
         >
           <div style={{ fontSize: 12, letterSpacing: "0.12em", textTransform: "uppercase", opacity: 0.6, marginBottom: 6 }}>
-            Speaker notes — {index + 1}. {slideHeadline(s)}
+            Presenter notes — {index + 1}. {slideHeadline(s)}
           </div>
           {s.narration ?? <em style={{ opacity: 0.6 }}>No narration for this slide.</em>}
           {s.notes ? <div style={{ marginTop: 10, opacity: 0.75 }}>{s.notes}</div> : null}
+          {s.annotations?.length ? (
+            <div style={{ marginTop: 12, paddingTop: 10, borderTop: "1px solid rgba(255,255,255,0.15)", fontSize: 14, opacity: 0.8 }} data-role="annotations">
+              {s.annotations.map((a, i) => {
+                const { text, url } = annotationParts(a);
+                return (
+                  <div key={i}>
+                    {text}
+                    {url && !text.includes(url) ? (
+                      <>
+                        {" "}
+                        <a href={url} target="_blank" rel="noreferrer" style={{ color: "inherit" }}>
+                          {url}
+                        </a>
+                      </>
+                    ) : null}
+                  </div>
+                );
+              })}
+            </div>
+          ) : null}
         </div>
       ) : null}
 

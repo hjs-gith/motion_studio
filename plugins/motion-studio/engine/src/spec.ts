@@ -46,12 +46,17 @@ const ThemeOverride = z.object({
   background: z.enum(BACKGROUNDS).optional(),
 });
 
+/** A reference or footnote for a slide: plain text, or text plus a link (clickable in HTML and PPTX). */
+const Annotation = z.union([z.string().min(1), z.object({ text: z.string().min(1), url: z.string().optional() })]);
+
 const Common = {
   id: z.string().optional(),
   /** Spoken voice-over for this slide. Becomes the script, speaker notes and TTS input. */
   narration: z.string().optional(),
   /** Extra presenter notes that are not spoken. */
   notes: z.string().optional(),
+  /** Sources and footnotes shown small at the bottom of the slide (and listed in the script and HTML notes). */
+  annotations: z.array(Annotation).max(4).optional(),
   /** Minimum on-screen time. Extended automatically to fit narration audio. */
   durationSec: z.number().positive().optional(),
   /** Transition INTO the next slide. */
@@ -285,7 +290,11 @@ export const Deck = z.object({
       style: z.string().optional(),
     })
     .default({ provider: "openai", quality: "medium" }),
-  captions: z.boolean().default(false),
+  /**
+   * Burn narration subtitles into the video. Omit for automatic: on when the video has no voice
+   * (no narration audio), off when it is narrated.
+   */
+  captions: z.boolean().optional(),
   music: z.object({ src: z.string(), volume: z.number().min(0).max(1).default(0.12) }).optional(),
   slides: z.array(Slide).min(1),
 });
@@ -296,6 +305,7 @@ export type BulletSpec = z.infer<typeof Bullet>;
 export type ColumnSpec = z.infer<typeof Column>;
 export type TransitionSpec = z.infer<typeof Transition>;
 export type GenerateSpec = z.infer<typeof Generate>;
+export type AnnotationSpec = z.infer<typeof Annotation>;
 
 export function parseDeck(raw: unknown): DeckSpec {
   const deck = Deck.parse(raw);
@@ -318,4 +328,12 @@ export function parseDeck(raw: unknown): DeckSpec {
 
 export function bulletText(b: BulletSpec): { text: string; sub?: string } {
   return typeof b === "string" ? { text: b } : b;
+}
+
+/** An annotation's text and optional link, plus how it reads on the slide ("text — example.org/page"). */
+export function annotationParts(a: AnnotationSpec): { text: string; url?: string; display: string } {
+  if (typeof a === "string") return { text: a, display: a };
+  const short = a.url?.replace(/^https?:\/\/(www\.)?/, "").replace(/\/$/, "");
+  const display = a.url && short && !a.text.includes(short) && !a.text.includes(a.url) ? `${a.text} — ${short}` : a.text;
+  return { text: a.text, url: a.url, display };
 }

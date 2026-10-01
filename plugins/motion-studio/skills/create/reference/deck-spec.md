@@ -13,7 +13,6 @@
   "theme": { "preset": "minimal", "style": "minimal" },
   "transition": { "type": "fade", "durationSec": 0.6 },
   "voice": { "engine": "none", "voice": "F1", "speed": 1.0 },
-  "captions": false,
   "music": { "src": "music.mp3", "volume": 0.12 },
   "slides": [ ... ]
 }
@@ -29,14 +28,14 @@
 | `theme.fonts` | Optional `heading`/`body`/`mono` from: Geist, Geist Mono, Inter, Manrope, DM Sans, Space Grotesk, Outfit, Playfair Display, DM Serif Display, JetBrains Mono. |
 | `theme.background` | `solid`, `grid`, `dots`, `gradient`, `orbs` (animated, except solid). Minimal style softens them. |
 | `transition` | Default transition between slides: `fade`, `slide`, `wipe`, `flip`, `clock-wipe`, `iris`, `none`; `direction` (`from-left/right/top/bottom`) for slide/wipe/flip; `durationSec`. |
-| `voice.engine` | `none` (silent; timing still follows estimated narration), `supertonic`, `say` (macOS, drafts only). See voices.md. |
+| `voice.engine` | `none` (no voice-over: timing follows the narration text, subtitles burn in, narration becomes presenter notes), `supertonic`, `say` (macOS, drafts only). See voices.md and "Decks without voice-over" below. |
 | `voice.voice` | Supertonic `F1`–`F5`/`M1`–`M5`, or a `say` voice name. |
 | `voice.lexicon` | Spoken respellings for TTS only, e.g. `{ "Prompt": "프롬프트" }`. See voices.md, "Mixed-language narration". |
 | `voice.spellAcronyms` | Spell all-caps acronyms with the deck language's letter names (default true). |
 | `voice.pace` | Even out speaking rate between sentences (Supertonic, Korean). Default `true`. See voices.md, "Even pacing". |
 | `voice.splitLatinPhrases` | In non-Latin decks, voice English phrases of at least N words in English (default 4, 0 = off). |
 | `images` | Image generation defaults: `{ "provider": "openai", "model": "gpt-image-2.5-flare", "quality": "medium", "style": "…" }`. See images.md. |
-| `captions` | Burn narration captions into the video. The SRT file is always produced. |
+| `captions` | Burn narration subtitles into the video. **Omit for automatic**: on when the video has no voice audio, off when narrated. `true`/`false` force it. An SRT file is written with every video and script render either way. |
 | `music` | Background audio file in `assets/`, looped under the narration. |
 
 ## Common slide fields
@@ -48,6 +47,7 @@ Every slide has a `layout` plus:
 | `id` | Stable, unique, kebab-case. Audio clips are keyed by it. Auto-assigned (`s01`…) if omitted, but set it. |
 | `narration` | Spoken text: the script, speaker notes and TTS input. Full sentences. |
 | `notes` | Presenter-only notes (not spoken). |
+| `annotations` | Up to 4 sources or footnotes, shown small in the slide's bottom margin: strings, or `{ "text": "…", "url": "https://…" }` (linked in HTML and PPTX). Also listed in the script and the HTML notes panel. See "Annotations" below. |
 | `durationSec` | Minimum on-screen time. Slides automatically extend to fit their narration audio (or its estimate). |
 | `transition` | Override the transition **out of** this slide into the next. |
 | `background` | Override the theme background for this slide. |
@@ -177,7 +177,31 @@ Use `statement` for your own thesis and `quote` for other people's words.
 ```
 `src` is a `.svg` in assets (or `svg` inline markup). `position`: `center` (full width, wide viewBox) or `left`/`right` (the visual beside notes). `animate`: `draw` (default: strokes trace in, then fills/text fade), `fade`, or `none`. `stepSec` spaces the `data-step` groups. **Read `svg-visuals.md` before writing SVG.**
 
+## Annotations (sources and footnotes)
+
+```json
+{ "id": "growth", "layout": "big-number", "value": 42, "suffix": "%", "label": "of teams ship weekly",
+  "annotations": [
+    { "text": "Source: DORA, State of DevOps Report (2024)", "url": "https://dora.dev/research/2024/" },
+    "¹ Survey of 3,000 respondents; self-reported."
+  ] }
+```
+- Use them for every sourced number, quote, chart, image credit or borrowed diagram, so the claims stay traceable. Format: "Source: author/publisher, title (year)". Keep each one under ~120 characters and 1–3 per slide; put longer citations in `notes`.
+- If the slide text points to a footnote, mark it yourself (e.g. "42%¹" in the label and "¹ …" in the annotation); nothing is numbered automatically.
+- Placement: bottom-left margin under the content (under the text column on `image-text`; white on a dark backing over full-bleed photos). In a video **with burned-in subtitles** they move to the top-right margin so the subtitles keep the bottom.
+- PPTX: a small text box in the bottom margin with live hyperlinks. Script: an "Annotations" list per slide. HTML: on the slide (links clickable) and in the N notes panel.
+
+## Decks without voice-over
+
+Leave `voice.engine` at `"none"` (the default) and still write `narration` for every slide. You get:
+- **Video**: no audio track; each slide stays up for its estimated narration time (~2.6 words/s, ~7 CJK chars/s), with the narration **burned in as subtitles** (automatic when `captions` is omitted) plus an `.srt` sidecar.
+- **HTML**: slides play their motion immediately (nothing to unmute); press **N** for presenter notes (narration, `notes`, annotations).
+- **PPTX**: narration and notes in the speaker notes. **Script**: the full narration with timings.
+
+To make a silent version of a deck that does have a voice, run `motionstudio render <dir> --no-voice` (add `--out <dir>/out-silent` to keep both). It ignores the audio clips without touching them, so switching back needs no re-synthesis. Set `captions: false` for a silent video without subtitles (e.g. played behind a live speaker).
+
 ## Timing model
+
 - A slide's length is the largest of: `durationSec` (or a layout default), its narration audio + 0.35s lead-in + 0.6s tail + the outgoing transition, and 1s.
 - Without audio, narration length is estimated (~2.6 words/s; ~7 CJK chars/s), so silent videos are still paced to the script.
 - Transitions overlap adjacent slides; the total runtime accounts for that.

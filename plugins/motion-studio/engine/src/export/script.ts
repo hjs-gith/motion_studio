@@ -1,6 +1,6 @@
 // Narration script (Markdown) and subtitles (SRT) from the deck timeline.
 import type { DeckSpec, SlideSpec } from "../spec";
-import { bulletText } from "../spec";
+import { annotationParts, bulletText } from "../spec";
 import { captionCues, formatTimestamp, type Timeline } from "../timeline";
 
 export function slideHeadline(s: SlideSpec): string {
@@ -82,6 +82,14 @@ export function scriptMarkdown(deck: DeckSpec, tl: Timeline): string {
     if (screen.length) lines.push(`**On screen:** ${screen.join(" / ")}`, "");
     if (s.narration) lines.push(`**Narration:**`, "", `> ${s.narration.replace(/\n+/g, "\n> ")}`, "");
     if (s.notes) lines.push(`**Notes:** ${s.notes}`, "");
+    if (s.annotations?.length) {
+      lines.push(`**Annotations:**`, "");
+      for (const a of s.annotations) {
+        const { text, url } = annotationParts(a);
+        lines.push(`- ${url ? `${text} <${url}>` : text}`);
+      }
+      lines.push("");
+    }
   }
   return lines.join("\n");
 }

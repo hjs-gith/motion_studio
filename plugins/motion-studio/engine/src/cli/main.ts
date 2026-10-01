@@ -4,9 +4,9 @@ import { existsSync, mkdirSync, writeFileSync } from "node:fs";
 import path from "node:path";
 import { parseArgs } from "node:util";
 import { z } from "zod";
-import { Deck, bulletText, type DeckSpec } from "../spec";
+import { Deck, annotationParts, bulletText, type DeckSpec } from "../spec";
 import { PRESETS } from "../themes";
-import { computeTimeline, estimateSpeechSec, formatTimestamp } from "../timeline";
+import { captionsOn, computeTimeline, estimateSpeechSec, formatTimestamp } from "../timeline";
 import { exportHtml } from "../export/html";
 import { exportPdf } from "../export/pdf";
 import { exportPptx } from "../export/pptx";
@@ -36,8 +36,9 @@ Usage:
                                                               Plan / generate images for slides with "generate" (paid: needs --yes)
   motionstudio stills <deck.json> [--slides 1,3] [--at 2.5] [--scale 0.5]
                                                               Render PNG previews of slides (for review)
-  motionstudio render <deck.json> [--formats video,html,pptx,pdf,script] [--draft] [--html-audio] [--out dir]
-                                                              Render outputs (default: all formats)
+  motionstudio render <deck.json> [--formats video,html,pptx,pdf,script] [--draft] [--html-audio] [--no-voice] [--out dir]
+                                                              Render outputs (default: all formats; --no-voice: leave
+                                                              narration audio out, subtitles on, timing from the text)
   motionstudio schema                                         Print the deck JSON schema
   motionstudio themes                                         List theme presets
   motionstudio doctor                                         Check the rendering and TTS environment
@@ -56,6 +57,7 @@ async function main() {
       out: { type: "string" },
       draft: { type: "boolean" },
       "html-audio": { type: "boolean" },
+      "no-voice": { type: "boolean" },
       force: { type: "boolean" },
       only: { type: "string" },
       slides: { type: "string" },
@@ -104,6 +106,7 @@ async function main() {
         formats: parseFormats(values.formats),
         draft: values.draft,
         htmlAudio: values["html-audio"],
+        noVoice: values["no-voice"],
       });
     case "schema":
       console.log(JSON.stringify(z.toJSONSchema(Deck, { io: "input" }), null, 2));
@@ -159,6 +162,10 @@ function validate(p: Project) {
   console.log(`✔ ${path.relative(USER_CWD, p.deckPath) || p.deckPath} is valid`);
   console.log(
     `  "${deck.title}" · ${deck.slides.length} slides · ${deck.format.width}x${deck.format.height}@${deck.format.fps} · theme ${deck.theme.preset} · voice ${deck.voice.engine}`,
+  );
+  const subs = captionsOn(deck, audio);
+  console.log(
+    `  Video subtitles ${subs ? "burned in" : "off"}${deck.captions === undefined ? ` (auto: ${subs ? "no voice audio" : "narrated"})` : ""} · SRT written with video/script`,
   );
   console.log(`  Estimated runtime ${formatTimestamp(tl.totalFrames, tl.fps)} · narration ~${words} words · audio clips ready ${Object.keys(audio).length}`);
   console.log("");
@@ -242,6 +249,11 @@ function lint(p: Project): string[] {
             inflectionHint(deck.lang, unknown, deck.voice.lexicon),
         );
     }
+    const notes = (s.annotations ?? []).map((a) => annotationParts(a).display);
+    if (notes.length > 3) w.push(`${at}: ${notes.length} annotations crowd the footer; keep 1–3 and move the rest to notes`);
+    notes.forEach((t, j) => {
+      if ([...t].length > 160) w.push(`${at}: annotation ${j + 1} is ${[...t].length} chars; shorten it (author, title, year) and put the full citation in notes`);
+    });
     if (deck.voice.engine !== "none" && !s.narration) w.push(`${at}: no narration while a voice engine is set (slide will be silent)`);
     if (s.narration && s.durationSec && estimateSpeechSec(s.narration) > s.durationSec + 0.5)
       w.push(`${at}: narration (~${estimateSpeechSec(s.narration).toFixed(1)}s) is longer than durationSec ${s.durationSec}; the slide will be extended`);
@@ -250,12 +262,18 @@ function lint(p: Project): string[] {
   return w;
 }
 
-async function render(p: Project, opts: { formats: Format[]; draft?: boolean; htmlAudio?: boolean }) {
+async function render(p: Project, opts: { formats: Format[]; draft?: boolean; htmlAudio?: boolean; noVoice?: boolean }) {
   mkdirSync(p.outDir, { recursive: true });
   if (p.pendingImages.length)
     log(`! ${p.pendingImages.length} slide image(s) are placeholders (not generated yet): ${p.pendingImages.map((j) => j.key).join(", ")}. Run \`motionstudio images\` first for final output.`);
+  // --no-voice: render as if the deck had no voice (silent video with subtitles, no HTML audio).
+  if (opts.noVoice) {
+    p.deck.voice.engine = "none";
+    log("• No voice: narration audio left out; timing follows the narration text and subtitles are on (unless captions is false).");
+  }
   const audio = currentAudio(p);
   const tl = computeTimeline(p.deck, audio, { estimateNarration: true });
+  const hasNarration = p.deck.slides.some((s) => s.narration);
   const out = (ext: string) => path.join(p.outDir, `${p.slug}${ext}`);
   const results: string[] = [];
   const t0 = Date.now();
@@ -263,10 +281,11 @@ async function render(p: Project, opts: { formats: Format[]; draft?: boolean; ht
   if (opts.formats.includes("script")) {
     writeFileSync(out("-script.md"), scriptMarkdown(p.deck, tl));
     results.push(out("-script.md"));
-    if (p.deck.slides.some((s) => s.narration)) {
-      writeFileSync(out(".srt"), srt(computeTimeline(p.deck, audio)));
-      results.push(out(".srt"));
-    }
+  }
+  // Subtitles: a sidecar SRT matching the video's timing, written with the script and with every video.
+  if (hasNarration && (opts.formats.includes("script") || opts.formats.includes("video"))) {
+    writeFileSync(out(".srt"), srt(computeTimeline(p.deck, audio)));
+    results.push(out(".srt"));
   }
   // Headless-Chrome work (video, PDF stills, SVG rasterizing for PPTX) shares one bundle.
   let serveUrl: string | undefined;

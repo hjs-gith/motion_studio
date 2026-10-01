@@ -9,7 +9,7 @@ import { clockWipe } from "@remotion/transitions/clock-wipe";
 import { iris } from "@remotion/transitions/iris";
 import type { DeckSpec, TransitionSpec } from "../spec";
 import { resolveTheme } from "../themes";
-import { computeTimeline, type AudioManifest } from "../timeline";
+import { captionsOn, computeTimeline, type AudioManifest } from "../timeline";
 import { AssetContext, ThemeContext, useAsset } from "./anim";
 import { SlideView } from "./SlideView";
 import { ensureFonts } from "./fonts";
@@ -46,6 +46,7 @@ export const DeckComposition: React.FC<DeckProps> = ({ deck, audio, assets }) =>
   const { width, height } = useVideoConfig();
   const theme = useMemo(() => resolveTheme(deck), [deck]);
   const timeline = useMemo(() => computeTimeline(deck, audio), [deck, audio]);
+  const captions = captionsOn(deck, audio);
   ensureFonts(theme);
 
   const children: React.ReactNode[] = [];
@@ -53,7 +54,7 @@ export const DeckComposition: React.FC<DeckProps> = ({ deck, audio, assets }) =>
     children.push(
       <TransitionSeries.Sequence key={`s-${t.id}`} durationInFrames={t.durationInFrames}>
         {/* Slides are opaque (own background, offset to the global frame) so transitions never show two layers of text. */}
-        <SlideView timed={t} forceBackground withAudio captions={deck.captions} />
+        <SlideView timed={t} forceBackground withAudio captions={captions} />
       </TransitionSeries.Sequence>,
     );
     if (t.transitionOut > 0) {

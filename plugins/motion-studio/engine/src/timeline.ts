@@ -26,6 +26,14 @@ export const AUDIO_LEAD_SEC = 0.35;
 /** Silence kept after narration ends, before the next transition starts. */
 export const AUDIO_TAIL_SEC = 0.6;
 
+/**
+ * Whether narration subtitles are burned into the video. `deck.captions` decides when set; otherwise
+ * they are on for videos without voice (no audio clips) so the narration still reaches the viewer.
+ */
+export function captionsOn(deck: DeckSpec, audio: AudioManifest): boolean {
+  return deck.captions ?? Object.keys(audio).length === 0;
+}
+
 /** Default on-screen time when there is no narration, by layout. */
 export function defaultDuration(s: SlideSpec): number {
   switch (s.layout) {
@@ -112,6 +120,9 @@ export function formatTimestamp(frames: number, fps: number, srt = false): strin
 /** Splits narration into caption cues with durations proportional to their length. */
 export function captionCues(text: string, startFrame: number, lengthFrames: number): { text: string; from: number; to: number }[] {
   const sentences = text
+    // Stage directions like [pause] and markdown emphasis are for the voice, not the viewer.
+    .replace(/\[[^\]]*\]/g, " ")
+    .replace(/\*\*|__/g, "")
     .split(/(?<=[.!?。！？])\s+|\n+/)
     .flatMap((s) => chunk(s.trim(), 90))
     .filter(Boolean);

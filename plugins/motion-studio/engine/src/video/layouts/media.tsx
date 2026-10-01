@@ -45,7 +45,14 @@ export const ImageSlide: React.FC<{ slide: Of<"image"> }> = ({ slide }) => {
         <AbsoluteFill style={{ background: `linear-gradient(0deg, ${alpha("#000", 0.75)} 0%, transparent 55%)` }} />
       ) : null}
       {slide.title || slide.caption ? (
-        <AbsoluteFill style={{ justifyContent: "flex-end", padding: `${u(90)}px ${u(140)}px`, color: contain ? theme.colors.text : "#fff" }}>
+        // Sits higher when annotations take the bottom margin.
+        <AbsoluteFill
+          style={{
+            justifyContent: "flex-end",
+            padding: `${u(90)}px ${u(140)}px ${u(90 + (slide.annotations?.length ?? 0) * 28)}px`,
+            color: contain ? theme.colors.text : "#fff",
+          }}
+        >
           {slide.title ? (
             <h1 style={{ margin: 0, fontFamily: fontStack(theme.fonts.heading), fontSize: u(fitSize(slide.title, 76, 36)), fontWeight: 700, letterSpacing: "-0.02em" }}>
               <WordReveal text={slide.title} delay={10} />

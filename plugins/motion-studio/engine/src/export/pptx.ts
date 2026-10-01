@@ -2,7 +2,7 @@
 import pptxgen from "pptxgenjs";
 import { existsSync, readFileSync } from "node:fs";
 import path from "node:path";
-import { bulletText, type ColumnSpec, type DeckSpec, type SlideSpec } from "../spec";
+import { annotationParts, bulletText, type ColumnSpec, type DeckSpec, type SlideSpec } from "../spec";
 import { resolveTheme, type Theme } from "../themes";
 import { looksLikeSvg, svgAspect, svgKey } from "../svg-utils";
 
@@ -29,6 +29,7 @@ export async function exportPptx(deck: DeckSpec, assetsDir: string, output: stri
     const slide = pptx.addSlide();
     decorate(ctx, slide, s);
     LAYOUTS[s.layout](ctx, slide, s as never);
+    annotations(ctx, slide, s);
     const notes = [s.narration, s.notes ? `[Notes] ${s.notes}` : undefined].filter(Boolean).join("\n\n");
     if (notes) slide.addNotes(notes);
   }
@@ -62,6 +63,39 @@ function decorate(ctx: Ctx, slide: PSlide, s: SlideSpec) {
   } else if (kind === "grid" || kind === "dots") {
     slide.addShape(pptx.ShapeType.ellipse, { x: W * 0.7, y: -H * 0.3, w: W * 0.45, h: W * 0.45, fill: { color: hex(c.accent), transparency: 94 }, line: { type: "none" } });
   }
+}
+
+/** Sources/footnotes in the bottom margin (below padY), linked when they have a url. */
+function annotations(ctx: Ctx, slide: PSlide, s: SlideSpec) {
+  if (!s.annotations?.length) return;
+  const { theme, W, H, k, padX } = ctx;
+  let x = padX;
+  let w = W - padX * 2;
+  if (s.layout === "image-text") {
+    // Under the text column, matching the "image-text" layout's 46% media panel.
+    const mw = W * 0.46;
+    x = s.side === "left" ? mw + 0.6 * k : padX;
+    w = W - mw - padX - 0.6 * k;
+  }
+  const onPhoto = s.layout === "image" && s.fit === "cover";
+  const color = onPhoto ? "FFFFFF" : hex(theme.colors.muted);
+  const runs: pptxgen.TextProps[] = s.annotations.map((a) => {
+    const { url, display } = annotationParts(a);
+    return { text: display, options: { breakLine: true, color, ...(url ? { hyperlink: { url, tooltip: url } } : {}) } };
+  });
+  const h = Math.min(ctx.padY - 0.08 * k, (0.08 + 0.17 * s.annotations.length) * k);
+  slide.addText(runs, {
+    x,
+    y: H - h - 0.12 * k,
+    w,
+    h,
+    fontSize: 9 * k,
+    fontFace: theme.fonts.body,
+    color,
+    valign: "bottom",
+    margin: 0,
+    fit: "shrink",
+  });
 }
 
 function heading(ctx: Ctx, slide: PSlide, text: string, y?: number, size = 36) {
@@ -276,8 +310,9 @@ const LAYOUTS: { [L in SlideSpec["layout"]]: (ctx: Ctx, slide: PSlide, s: Of<L>)
       if (s.title || s.caption) slide.addShape(ctx.pptx.ShapeType.rect, { x: 0, y: H * 0.62, w: W, h: H * 0.38, fill: { color: "000000", transparency: 45 }, line: { type: "none" } });
     }
     const textColor = s.fit === "contain" ? hex(theme.colors.text) : "FFFFFF";
-    if (s.title) slide.addText(s.title, { x: padX, y: H - 1.7 * k, w: W - padX * 2, h: 0.8 * k, fontSize: fit(s.title, 34, 36) * k, bold: true, color: textColor, fontFace: theme.fonts.heading, margin: 0 });
-    if (s.caption) slide.addText(s.caption, { x: padX, y: H - 0.9 * k, w: W - padX * 2, h: 0.5 * k, fontSize: 16 * k, color: textColor, fontFace: theme.fonts.body, margin: 0 });
+    const lift = (s.annotations?.length ?? 0) * 0.17 * k;
+    if (s.title) slide.addText(s.title, { x: padX, y: H - 1.7 * k - lift, w: W - padX * 2, h: 0.8 * k, fontSize: fit(s.title, 34, 36) * k, bold: true, color: textColor, fontFace: theme.fonts.heading, margin: 0 });
+    if (s.caption) slide.addText(s.caption, { x: padX, y: H - 0.9 * k - lift, w: W - padX * 2, h: 0.5 * k, fontSize: 16 * k, color: textColor, fontFace: theme.fonts.body, margin: 0 });
   },
   split(ctx, slide, s) {
     const { W, H, k, padX, padY } = ctx;

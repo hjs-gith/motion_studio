@@ -6,7 +6,8 @@ A Claude Code plugin that turns a topic, brief or document into:
 - **HTML slides**: a single self-contained file that plays each slide's animation live. With `--html-audio` the narration is embedded; the deck opens silent with a Play button, and M toggles mute
 - **Editable PowerPoint** (.pptx) with native text, charts and speaker notes
 - **PDF** handout
-- **Script** (Markdown with timestamps) and **subtitles** (SRT)
+- **Script** (Markdown with timestamps) and **subtitles** (SRT, and burned into the video when there's no voice-over)
+- Per-slide **annotations** for sources and footnotes: shown small on the slide, linked in HTML/PPTX, listed in the script
 - Optional **narration** via local open-source TTS: [Supertonic](https://github.com/supertone-inc/supertonic) (or macOS `say` for quick drafts), with mixed-language pronunciation handling (e.g. Korean narration with English terms)
 - Optional **generated images** through a pluggable image-provider interface, starting with OpenAI `gpt-image-2.5` (flare/sunburst)
 
@@ -82,6 +83,12 @@ echo 'export OPENAI_API_KEY=sk-...' >> ~/.zshrc
 ```
 
 (or add `"env": { "OPENAI_API_KEY": "…" }` to `~/.claude/settings.json`). Providers live in `engine/src/images/`; adding Gemini, Recraft or FLUX means implementing one `ImageProvider`. See [`images.md`](plugins/motion-studio/skills/create/reference/images.md).
+
+## Annotations and decks without voice-over
+
+Each slide can carry `annotations`: short source or footnote lines (`"Source: OECD, Education at a Glance (2024)"` or `{ "text": "…", "url": "…" }`) shown in the slide's bottom margin, with live links in HTML and PPTX.
+
+Narration is optional as audio. With `voice.engine: "none"` (the default) the narration text still drives slide timing and becomes burned-in subtitles plus an SRT for the video, presenter notes in the HTML deck (press N) and PPTX, and the script. `motionstudio render <dir> --no-voice` makes the same silent version of a narrated deck. See [`deck-spec.md`](plugins/motion-studio/skills/create/reference/deck-spec.md).
 
 ## Mixed-language narration
 

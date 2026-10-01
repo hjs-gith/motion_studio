@@ -7,7 +7,6 @@ export const STARTER_DECK = {
   theme: { preset: "minimal" },
   transition: { type: "fade", durationSec: 0.6 },
   voice: { engine: "none", voice: "F1", speed: 1 },
-  captions: false,
   slides: [
     {
       id: "intro",
@@ -54,6 +53,7 @@ export const STARTER_DECK = {
         ],
       },
       caption: "Sample data",
+      annotations: ["Illustrative figures, not real results.", { text: "Chart types: bar, line, donut", url: "https://www.remotion.dev" }],
       narration: "Charts are defined as data, animate on screen, and export as native, editable PowerPoint charts.",
       transition: { type: "wipe", direction: "from-left" },
     },
