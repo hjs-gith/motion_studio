@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="-50 -50 1700 660" width="850" height="330" font-family="Geist, Inter, -apple-system, 'Segoe UI', Helvetica, Arial, sans-serif">
+  <!-- Generated from examples/minimal/assets/flow.svg with the minimal-dark theme colors. -->
+  <rect x="-50" y="-50" width="1700" height="660" rx="28" fill="#0C0C0D" stroke="#8C8C88" stroke-opacity="0.25" stroke-width="2"/>
+  <!-- Four-stage pipeline. data-step orders the build: box, arrow, box, arrow… -->
+  <g data-step="1">
+    <rect x="20" y="150" width="300" height="220" rx="6" fill="none" stroke="#F4F4F2" stroke-width="3"/>
+    <text x="50" y="215" font-size="22" fill="#8C8C88" letter-spacing="2">01</text>
+    <text x="50" y="290" font-size="46" font-weight="600" fill="#F4F4F2">Capture</text>
+    <text x="50" y="335" font-size="24" fill="#8C8C88">notes, docs, data</text>
+  </g>
+  <g data-step="2">
+    <path d="M340 260 H 420" stroke="#8C8C88" stroke-width="3" fill="none"/>
+    <path d="M405 246 L 422 260 L 405 274" stroke="#8C8C88" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+  <g data-step="3">
+    <rect x="440" y="150" width="300" height="220" rx="6" fill="none" stroke="#F4F4F2" stroke-width="3"/>
+    <text x="470" y="215" font-size="22" fill="#8C8C88" letter-spacing="2">02</text>
+    <text x="470" y="290" font-size="46" font-weight="600" fill="#F4F4F2">Structure</text>
+    <text x="470" y="335" font-size="24" fill="#8C8C88">outline and script</text>
+  </g>
+  <g data-step="4">
+    <path d="M760 260 H 840" stroke="#8C8C88" stroke-width="3" fill="none"/>
+    <path d="M825 246 L 842 260 L 825 274" stroke="#8C8C88" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+  <g data-step="5">
+    <rect x="860" y="150" width="300" height="220" rx="6" fill="none" stroke="#F4F4F2" stroke-width="3"/>
+    <text x="890" y="215" font-size="22" fill="#8C8C88" letter-spacing="2">03</text>
+    <text x="890" y="290" font-size="46" font-weight="600" fill="#F4F4F2">Render</text>
+    <text x="890" y="335" font-size="24" fill="#8C8C88">motion and audio</text>
+  </g>
+  <g data-step="6">
+    <path d="M1180 260 H 1260" stroke="#FF5A2B" stroke-width="3" fill="none"/>
+    <path d="M1245 246 L 1262 260 L 1245 274" stroke="#FF5A2B" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+  <g data-step="7">
+    <rect x="1280" y="150" width="300" height="220" rx="6" fill="#FF5A2B" stroke="#FF5A2B" stroke-width="3"/>
+    <text x="1310" y="215" font-size="22" fill="#0C0C0D" letter-spacing="2" opacity="0.8">04</text>
+    <text x="1310" y="290" font-size="46" font-weight="600" fill="#0C0C0D">Ship</text>
+    <text x="1310" y="335" font-size="24" fill="#0C0C0D" opacity="0.85">video, slides, pptx</text>
+  </g>
+  <g data-step="8">
+    <path d="M170 430 V 470 H 1430 V 430" stroke="#8C8C88" stroke-width="2" fill="none" stroke-dasharray="1 0"/>
+    <text x="800" y="530" font-size="24" text-anchor="middle" fill="#8C8C88">one deck.json drives every stage</text>
+  </g>
+</svg>
